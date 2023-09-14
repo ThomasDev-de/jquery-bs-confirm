@@ -1,0 +1,30 @@
+
+<!doctype html>
+<html lang="en" data-bs-theme="dark">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Bootstrap demo</title>
+    <link href="../vendor/twbs/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="container">
+<h1>jQuery-bs-confirm</h1>
+<button id="btn1" class="btn btn-primary">default</button>
+<button id="btn2" class="btn btn-primary">without header</button>
+<script src="../vendor/components/jquery/jquery.min.js"></script>
+<script src="../vendor/twbs/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+<script src="../dist/jquery-bs-confirm.min.js"></script>
+<script>
+    (function($){
+        $('#btn1').on('click', function (){
+            $.confirm();
+        })
+        $('#btn2').on('click', function (){
+            $.confirm({
+                showHeader:false
+            });
+        })
+    }(jQuery));
+</script>
+</body>
+</html>
