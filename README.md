@@ -1,6 +1,7 @@
 # jquery-bs-confirm
-
 A small JQuery plugin that creates a confirmation dialog using the bootstrap modal.
+
+![](/demo/img/dialog.png)  
 
 ## options
 
