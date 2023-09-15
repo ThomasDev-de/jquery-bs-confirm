@@ -8,13 +8,13 @@ $.confirm = function (options) {
         animationClass:'fade',
         confirmText: 'confirm',
         cancelText: 'cancel',
-        onConfirm: function () {
+        onConfirm() {
 
         },
-        onCancel: function () {
+        onCancel() {
 
         },
-        onComplete: function (isConfirmed) {
+        onComplete(isConfirmed) {
 
         }
     }, options || {});
