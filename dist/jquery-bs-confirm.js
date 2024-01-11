@@ -8,17 +8,15 @@ $.confirm = function (options) {
         animationClass:'fade',
         confirmText: 'confirm',
         cancelText: 'cancel',
-        onConfirm() {
-
-        },
-        onCancel() {
-
-        },
-        onComplete(isConfirmed) {
-
-        }
+        onConfirm() {},
+        onCancel() {},
+        onComplete(isConfirmed) {},
+        onHidden() {},
+        onHide() {},
+        onShow() {},
+        onShown() {},
     }, options || {});
-    const modalId = '3f31c593-6f58-4179-ae66-b1c649efde5f';
+    const modalId = 'modal-confirm-3f31c593-6f58-4179-ae66-b1c649efde5f';
 
     let modal = null;
 
@@ -54,7 +52,7 @@ $.confirm = function (options) {
 
         modal = $('<div>', {
             'data-bs-theme': theme,
-            class: `modal ${settings.animationClass} fade animate__animated animate__zoomIn animate__faster`,
+            class: `modal ${settings.animationClass}`,
             id: modalId,
             'data-bs-backdrop': 'static',
             'aria-hidden': true,
@@ -82,9 +80,19 @@ $.confirm = function (options) {
                 settings.onComplete(false);
                 modal.modal('hide');
             })
-            .on('hidden.bs.modal', '#' + modalId, function () {
+            .on('hidden.bs.modal', function () {
+                settings.onHidden();
                 $(this).remove();
             })
+            .on('hide.bs.modal', function () {
+                settings.onHide();
+            })
+            .on('show.bs.modal', function () {
+                settings.onShow();
+            })
+            .on('shown.bs.modal', function () {
+                settings.onShown();
+            });
     }
     init();
 }
