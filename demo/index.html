@@ -1,29 +1,202 @@
-
 <!doctype html>
 <html lang="en" data-bs-theme="dark">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Bootstrap demo</title>
+    <title>jquery-bs-confirm Demo</title>
     <link href="../vendor/twbs/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { min-height: 100vh; }
+        .demo-wrap { max-width: 1100px; }
+        .demo-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 12px;
+        }
+        .example-card {
+            border: 1px solid var(--bs-border-color);
+            border-radius: 8px;
+            padding: 14px;
+            background: var(--bs-body-bg);
+        }
+        .event-log {
+            max-height: 320px;
+            overflow: auto;
+            font-family: var(--bs-font-monospace);
+            font-size: .85rem;
+            white-space: pre-wrap;
+        }
+        .modal.zoom-in .modal-dialog {
+            transform: scale(.92);
+            transition: transform .2s ease-out;
+        }
+        .modal.show.zoom-in .modal-dialog { transform: scale(1); }
+    </style>
 </head>
-<body class="container">
-<h1>jQuery-bs-confirm</h1>
-<button id="btn1" class="btn btn-primary">default</button>
-<button id="btn2" class="btn btn-primary">without header</button>
+<body>
+<main class="container py-4 demo-wrap">
+    <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
+        <div>
+            <h1 class="h3 mb-1">jquery-bs-confirm</h1>
+            <p class="text-body-secondary mb-0">Interactive demo covering all plugin options.</p>
+        </div>
+        <button id="toggleTheme" class="btn btn-outline-secondary btn-sm">Toggle Theme</button>
+    </div>
+
+    <section class="demo-grid mb-4">
+        <article class="example-card">
+            <h2 class="h6 mb-2">Default Config</h2>
+            <p class="small text-body-secondary mb-3">Uses all default values.</p>
+            <button id="demoDefault" class="btn btn-primary btn-sm">Open</button>
+        </article>
+        <article class="example-card">
+            <h2 class="h6 mb-2">No Header</h2>
+            <p class="small text-body-secondary mb-3">Demonstrates <code>showHeader: false</code>.</p>
+            <button id="demoNoHeader" class="btn btn-primary btn-sm">Open</button>
+        </article>
+        <article class="example-card">
+            <h2 class="h6 mb-2">Custom Title + Message (HTML)</h2>
+            <p class="small text-body-secondary mb-3">Shows <code>title</code> and <code>message</code> as HTML.</p>
+            <button id="demoHtmlContent" class="btn btn-primary btn-sm">Open</button>
+        </article>
+        <article class="example-card">
+            <h2 class="h6 mb-2">Dialog Size/Class</h2>
+            <p class="small text-body-secondary mb-3">Uses <code>dialog: "modal-lg modal-dialog-scrollable"</code>.</p>
+            <button id="demoDialogClass" class="btn btn-primary btn-sm">Open</button>
+        </article>
+        <article class="example-card">
+            <h2 class="h6 mb-2">Animation Variants</h2>
+            <p class="small text-body-secondary mb-3">Compares <code>animationClass</code> values.</p>
+            <div class="d-flex gap-2 flex-wrap">
+                <button id="demoFade" class="btn btn-primary btn-sm">fade</button>
+                <button id="demoNoFade" class="btn btn-secondary btn-sm">none</button>
+                <button id="demoZoom" class="btn btn-info btn-sm">zoom-in</button>
+            </div>
+        </article>
+        <article class="example-card">
+            <h2 class="h6 mb-2">Custom Button Labels</h2>
+            <p class="small text-body-secondary mb-3">Sets <code>confirmText</code> and <code>cancelText</code>.</p>
+            <button id="demoButtonText" class="btn btn-primary btn-sm">Open</button>
+        </article>
+        <article class="example-card">
+            <h2 class="h6 mb-2">Callbacks</h2>
+            <p class="small text-body-secondary mb-3">Fires all callback hooks and logs outputs.</p>
+            <button id="demoCallbacks" class="btn btn-warning btn-sm">Open Callback Demo</button>
+        </article>
+    </section>
+
+    <section class="example-card">
+        <div class="d-flex align-items-center justify-content-between mb-2">
+            <h2 class="h6 mb-0">Event Log</h2>
+            <button id="clearLog" class="btn btn-outline-secondary btn-sm">Clear</button>
+        </div>
+        <div id="eventLog" class="event-log"></div>
+    </section>
+</main>
+
 <script src="../vendor/components/jquery/jquery.min.js"></script>
 <script src="../vendor/twbs/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
 <script src="../dist/jquery-bs-confirm.min.js"></script>
 <script>
-    (function($){
-        $('#btn1').on('click', function (){
-            $.confirm();
-        })
-        $('#btn2').on('click', function (){
-            $.confirm({
-                showHeader:false
+    (function($) {
+        const $log = $('#eventLog');
+
+        function log(message) {
+            const time = new Date().toLocaleTimeString();
+            const line = '[' + time + '] ' + message;
+            $log.prepend($('<div>').text(line));
+        }
+
+        function withTrackedCallbacks(config, label) {
+            return $.extend(true, {}, config, {
+                onShow: function() { log(label + ': onShow'); },
+                onShown: function() { log(label + ': onShown'); },
+                onHide: function() { log(label + ': onHide'); },
+                onHidden: function() { log(label + ': onHidden'); },
+                onConfirm: function() { log(label + ': onConfirm'); },
+                onCancel: function() { log(label + ': onCancel'); },
+                onComplete: function(isConfirmed) { log(label + ': onComplete(' + isConfirmed + ')'); }
             });
-        })
+        }
+
+        $('#toggleTheme').on('click', function() {
+            const $html = $('html');
+            const current = $html.attr('data-bs-theme');
+            const next = current === 'dark' ? 'light' : 'dark';
+            $html.attr('data-bs-theme', next);
+            log('Theme switched to ' + next);
+        });
+
+        $('#clearLog').on('click', function() {
+            $log.empty();
+        });
+
+        $('#demoDefault').on('click', function() {
+            $.confirm();
+        });
+
+        $('#demoNoHeader').on('click', function() {
+            $.confirm({
+                showHeader: false
+            });
+        });
+
+        $('#demoHtmlContent').on('click', function() {
+            $.confirm({
+                title: 'Delete <span class="text-danger">3 files</span>?',
+                message: '<p class="mb-2">This action will remove:</p><ul class="mb-0"><li>report.csv</li><li>backup.zip</li><li>notes.txt</li></ul>'
+            });
+        });
+
+        $('#demoDialogClass').on('click', function() {
+            $.confirm({
+                dialog: 'modal-lg modal-dialog-scrollable',
+                title: 'Large scrollable dialog',
+                message: '<p>This demo applies custom classes on <code>.modal-dialog</code>.</p><p>Line 1</p><p>Line 2</p><p>Line 3</p><p>Line 4</p><p>Line 5</p><p>Line 6</p><p>Line 7</p><p>Line 8</p>'
+            });
+        });
+
+        $('#demoFade').on('click', function() {
+            $.confirm({
+                animationClass: 'fade',
+                title: 'Animation: fade',
+                message: 'Bootstrap fade animation (default).'
+            });
+        });
+
+        $('#demoNoFade').on('click', function() {
+            $.confirm({
+                animationClass: '',
+                title: 'Animation: none',
+                message: 'Modal opens without animation.'
+            });
+        });
+
+        $('#demoZoom').on('click', function() {
+            $.confirm({
+                animationClass: 'fade zoom-in',
+                title: 'Animation: zoom-in',
+                message: 'Custom CSS class combined with Bootstrap fade.'
+            });
+        });
+
+        $('#demoButtonText').on('click', function() {
+            $.confirm({
+                title: 'Publish release?',
+                message: 'The release will become visible to all users.',
+                confirmText: 'Publish now',
+                cancelText: 'Review first'
+            });
+        });
+
+        $('#demoCallbacks').on('click', function() {
+            $.confirm(withTrackedCallbacks({
+                title: 'Callback test',
+                message: 'Confirm or cancel this dialog and inspect the event order in the log.',
+                confirmText: 'Confirm callback',
+                cancelText: 'Cancel callback'
+            }, 'callbacks'));
+        });
     }(jQuery));
 </script>
 </body>
